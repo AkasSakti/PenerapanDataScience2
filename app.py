@@ -36,7 +36,7 @@ category_mapping = {
 data['Course_Label'] = data['Course'].replace(category_mapping)
 
 # Remove sidebar and dashboard, show only prediction
-st.subheader("Prediction")
+st.subheader("Prediction of Drop Out or Not Jaya Jaya Jaya")
 course_list = list(data.Course_Label.unique())[::-1]
 course_list.sort()
 
