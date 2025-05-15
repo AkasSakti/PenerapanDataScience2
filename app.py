@@ -1,10 +1,18 @@
-import streamlit as st
+import streamlit as st 
 import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+import plotly.express as px
 from joblib import load
+import plotly.graph_objects as go
 
-# Load data dan model
-data = pd.read_csv("dataset/data_cleaned.csv")
-model = load("model/random_forest_model.joblib")  # Contoh nama file model, sesuaikan dengan milikmu
+st.set_page_config(layout="wide") #wide or centered
+
+data = pd.read_csv("dataset/data_cleaned.csv", delimiter=",")
+
+data_0 = data.loc[data['Status']==0]
+data_1 = data.loc[data['Status']==1]
+data_2 = data.loc[data['Status']==2]
 
 category_mapping = {
     33: 'Biofuel Production Technologies',
@@ -25,41 +33,138 @@ category_mapping = {
     9853: 'Basic Education',
     9991: 'Management (evening attendance)'
 }
-
 data['Course_Label'] = data['Course'].replace(category_mapping)
 
-if st.sidebar.selectbox("Choose a page", ["Dashboard", "Prediction"]) == "Prediction":
-    st.title("Student Dropout Prediction")
+# Remove sidebar and dashboard, show only prediction
+st.subheader("Prediction")
+course_list = list(data.Course_Label.unique())[::-1]
+course_list.sort()
 
-    # Input user (contoh input, sesuaikan dengan fitur model)
-    selected_course = st.selectbox('Select course', ['None'] + list(data['Course_Label'].unique()))
-    selected_gender = st.selectbox('Select gender', ['None', 'Male', 'Female'])
-    selected_attendance = st.selectbox('Select attendance time', ['None', 'Daytime', 'Evening'])
-    selected_grade_1st = st.number_input('Enter 1st Semester Grade', min_value=0.0, max_value=100.0, value=75.0)
-    selected_grade_2nd = st.number_input('Enter 2nd Semester Grade', min_value=0.0, max_value=100.0, value=75.0)
+if 'pred_selected' not in st.session_state:
+    st.session_state.pred_selected = None
 
-    # Convert inputs ke bentuk model input (contoh)
-    course_code = None
-    if selected_course != 'None':
-        # mapping balik dari nama ke kode
-        inv_map = {v: k for k, v in category_mapping.items()}
-        course_code = inv_map.get(selected_course, 0)
+if st.session_state.pred_selected is None:
+    course_selected = st.selectbox('Course', ['None', *course_list])
+else:
+    course_selected = st.selectbox('Course', course_list)
+
+if course_selected == 'None':
+    st.error("Please select a valid course.")
+else:
+    st.session_state.course_selected = course_selected
+
+reverse_mapping = {v: k for k, v in category_mapping.items()}
+
+if course_selected != 'None':
+    course_selected = reverse_mapping[course_selected]
+
+# ===============================================================
+
+if course_selected in [9991, 8014]:
+    time_selected=0
+else:
+    time_selected=1
+
+# ===============================================================
+
+admgrade_selected = st.number_input("Admission grade", value=0.0, step=0.1, min_value=0.0, max_value=200.0)
+admgrade_selected = round(admgrade_selected,1)
+
+# ===============================================================
+
+colGender, colAge = st.columns(2)
+
+with colGender:
+    gender_list = ['Male', 'Female']
+    gender_selected = st.selectbox('Gender', (gender_list))
+
+    if gender_selected=="Female":
+        gender_selected=0
+    elif gender_selected=="Male":
+        gender_selected=1
+
+with colAge:
+    age_selected = st.number_input("Age at enrollment", step=1, min_value=17, max_value=70)
+
+# ===============================================================
+bool1, bool2 = st.columns(2)
+
+with bool1:
+    special_list = ['Yes', 'No']
+    special_selected = st.radio('Special education needs?', (special_list))
+
+    if (special_selected=="No"):
+        special_selected=0
+    elif(special_selected=="Yes"):
+        special_selected=1
+    
+# ===============================================================
+with bool2:
+    debtor_list = ['Yes', 'No']
+    debtor_selected = st.radio('Debtor?', (debtor_list))
+
+    if (debtor_selected=="No"):
+        debtor_selected=0
+    elif(debtor_selected=="Yes"):
+        debtor_selected=1
+
+# ===============================================================
+bool3, bool4 = st.columns(2)
+with bool3:
+    tuition_list = ['Yes', 'No']
+    tuition_selected = st.radio('Tuition up to date?', (tuition_list))
+
+    if (tuition_selected=="No"):
+        tuition_selected=0
+    elif(tuition_selected=="Yes"):
+        tuition_selected=1
+
+# ===============================================================
+with bool4:
+    scholarship_list = ['Yes', 'No']
+    scholarship_selected = st.radio('Scholarship holder?', (scholarship_list))
+
+    if (scholarship_selected=="No"):
+        scholarship_selected=0
+    elif(scholarship_selected=="Yes"):
+        scholarship_selected=1
+
+# ===============================================================
+grade1, grade2 = st.columns(2)
+
+with grade1:   
+    grade1_selected = st.number_input("First semester grade", value=0.0, step=0.1, min_value=0.0, max_value=20.0)
+    grade1_selected = round(grade1_selected,2)
+
+with grade2:
+    grade2_selected = st.number_input("Second semester grade", value=0.0, step=0.1, min_value=0.0, max_value=20.0)
+    grade2_selected = round(grade2_selected,2)
+
+st.markdown('<style>div.stButton > button {margin: 0 auto; display: block; background: white; color: black;}</style>', unsafe_allow_html=True)
+button_predict = st.button("Predict", key='custom_button')
+if button_predict:
+    if course_selected=="None":
+        st.write("Please select a valid course.")
     else:
-        course_code = 0
+        model = load('model/random_forest_model.joblib')
+        user_data = {
+            'Course': [course_selected], 
+            'Daytime_evening_attendance': [time_selected], 
+            'Admission_grade': [admgrade_selected], 
+            'Educational_special_needs': [special_selected], 
+            'Debtor': [debtor_selected], 
+            'Tuition_fees_up_to_date': [tuition_selected], 
+            'Gender': [gender_selected], 
+            'Scholarship_holder': [scholarship_selected], 
+            'Age_at_enrollment': [age_selected], 
+            'Curricular_units_1st_sem_grade': [grade1_selected],
+            'Curricular_units_2nd_sem_grade': [grade2_selected]
+        }
 
-    gender_code = 1 if selected_gender == 'Male' else 0 if selected_gender == 'Female' else -1
-    attendance_code = 1 if selected_attendance == 'Daytime' else 0 if selected_attendance == 'Evening' else -1
-
-    # Prepare fitur untuk prediksi (pastikan urutan fitur sesuai model)
-    input_features = pd.DataFrame([{
-        'Course': course_code,
-        'Gender': gender_code,
-        'Daytime_evening_attendance': attendance_code,
-        'Curricular_units_1st_sem_grade': selected_grade_1st,
-        'Curricular_units_2nd_sem_grade': selected_grade_2nd
-    }])
-
-    if st.button("Predict Dropout Status"):
-        prediction = model.predict(input_features)[0]
-        status_map = {0: "Dropout", 1: "Enrolled", 2: "Graduated"}
-        st.success(f"Predicted status: {status_map.get(prediction, 'Unknown')}")
+        X_new = pd.DataFrame(user_data)
+        predictions = model.predict(X_new)
+        st.subheader("Prediction Result")
+        if predictions == 0:
+            st.write("Student is likely to dropout.")
+        elif predictions == 1:
+            st.write("Student is NOT likely to dropout.")
