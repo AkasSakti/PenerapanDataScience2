@@ -8,7 +8,7 @@ import plotly.graph_objects as go
 
 st. set_page_config(layout="wide") #wide or centered
 
-data = pd.read_csv("dataset/datacleaned.csv", delimiter=",")
+data = pd.read_csv("dataset/data_cleaned.csv", delimiter=",")
 data_0 = data.loc[data['Status']==0]
 data_1 = data.loc[data['Status']==1]
 data_2 = data.loc[data['Status']==2]
