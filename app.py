@@ -5,8 +5,8 @@ import numpy as np
 import pandas as pd
 
 # Load the trained model and scaler
-model = joblib.load('random_forest_model.joblib')
-scaler = joblib.load('scaler_model.joblib')
+model = joblib.load('model/random_forest_model.joblib')
+scaler = joblib.load('model/scaler_model.joblib')
 
 # Title
 st.title('Student Attrition Prediction App')
