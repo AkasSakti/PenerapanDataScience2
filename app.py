@@ -1,19 +1,20 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
-from sklearn.preprocessing import StandardScaler
 from joblib import load
 
 st.title('🎓 Student Status Prediction App')
 st.write('Aplikasi prediksi status mahasiswa (Dropout, Graduate, Enrolled) menggunakan Random Forest')
 
-# === [1] Load Pretrained Model ===
+# === [1] Load Pretrained Model dan Scaler ===
 model_path = 'model/rf_model.joblib'
+scaler_path = 'model/scaler.joblib'
+
 try:
     model = load(model_path)
-    st.success(f'Model berhasil dimuat dari: {model_path}')
+    scaler = load(scaler_path)
+    st.success(f'Model dan scaler berhasil dimuat dari folder model/')
 except Exception as e:
-    st.error(f'Gagal memuat model: {e}')
+    st.error(f'Gagal memuat model atau scaler: {e}')
     st.stop()
 
 # === [2] Input Data untuk Prediksi ===
@@ -43,8 +44,7 @@ features = {
 input_df = pd.DataFrame([features])
 
 # === [3] Scaling Data ===
-scaler = StandardScaler()
-input_scaled = scaler.fit_transform(input_df)
+input_scaled = scaler.transform(input_df)
 
 # === [4] Prediksi ===
 if st.button('Prediksi Status'):
