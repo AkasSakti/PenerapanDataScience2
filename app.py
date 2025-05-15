@@ -14,10 +14,10 @@ st.title('Student Attrition Prediction App')
 # User Inputs
 st.header('Input Student Information')
 
-# Pilihan input dari user
 course = st.selectbox('Course', [
     '171', '33', '8014', '9003', '9070', '120', '9001', '8013', '8012', '9000',
-    '8015', '8011', '9002', '8010', '8009', '8008', '8007'
+    '8015', '8011', '9002', '8010', '8009', '8008', '8007',
+    '9085', '9119', '9130', '9147', '9238' 
 ])
 
 gender = st.selectbox('Gender', ['Male', 'Female'])
@@ -36,7 +36,8 @@ sem2_grade = st.slider('Curricular Units 2nd Sem Grade', 0.0, 20.0, 10.0)
 # One-Hot Encoding (Reconstruction)
 courses = [
     '171', '33', '8014', '9003', '9070', '120', '9001', '8013', '8012', '9000',
-    '8015', '8011', '9002', '8010', '8009', '8008', '8007'
+    '8015', '8011', '9002', '8010', '8009', '8008', '8007',
+    '9085', '9119', '9130', '9147', '9238'  
 ]
 
 daytimes = ['Daytime', 'Evening']
