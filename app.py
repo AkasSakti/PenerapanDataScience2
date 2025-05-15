@@ -1,65 +1,95 @@
+# app.py
 import streamlit as st
-import pandas as pd
 import joblib
-from sklearn.preprocessing import StandardScaler
+import numpy as np
+import pandas as pd
 
-# === [1] Title & Description ===
-st.title('🎓 Student Status Prediction App')
-st.write('Aplikasi prediksi status mahasiswa (Dropout, Graduate, Enrolled) menggunakan Random Forest')
+# Load the trained model and scaler
+model = joblib.load('model/random_forest_model.joblib')
+scaler = joblib.load('model/scaler_model.joblib')
 
-# === [2] Load Model dan Scaler ===
-model_path = 'model/rf_model.joblib'
-scaler_path = 'model/scaler.joblib'
+# Title
+st.title('Student Attrition Prediction App')
 
-try:
-    model = joblib.load(model_path)
-    scaler = joblib.load(scaler_path)
-    st.success('Model dan Scaler berhasil dimuat!')
-except Exception as e:
-    st.error(f'Gagal memuat model atau scaler: {e}')
-    st.stop()
+# User Inputs
+st.header('Input Student Information')
 
-# === [3] Input Data Mahasiswa ===
-st.subheader('Input Data Mahasiswa')
-features = {
-    'Marital_status': st.selectbox('Marital Status', [0, 1, 2]),
-    'Application_mode': st.number_input('Application Mode', min_value=0, max_value=20, value=0),
-    'Application_order': st.number_input('Application Order', min_value=0, max_value=20, value=0),
-    'Course': st.number_input('Course', min_value=0, max_value=10000, value=0),
-    'Daytime_evening_attendance': st.selectbox('Daytime/Evening Attendance', [0, 1]),
-    'Previous_qualification': st.number_input('Previous Qualification', min_value=0, max_value=10, value=0),
-    'Previous_qualification_grade': st.number_input('Previous Qualification Grade', min_value=0.0, max_value=20.0, value=0.0),
-    'Nacionality': st.number_input('Nacionality', min_value=0, max_value=300, value=0),
-    'Mothers_qualification': st.number_input('Mothers Qualification', min_value=0, max_value=10, value=0),
-    'Fathers_qualification': st.number_input('Fathers Qualification', min_value=0, max_value=10, value=0),
-    'Mothers_occupation': st.number_input('Mothers Occupation', min_value=0, max_value=10, value=0),
-    'Fathers_occupation': st.number_input('Fathers Occupation', min_value=0, max_value=10, value=0),
-    'Admission_grade': st.number_input('Admission Grade', min_value=0.0, max_value=20.0, value=0.0),
-    'Displaced': st.selectbox('Displaced', [0, 1]),
-    'Educational_special_needs': st.selectbox('Educational Special Needs', [0, 1]),
-    'Debtor': st.selectbox('Debtor', [0, 1]),
-    'Tuition_fees_up_to_date': st.selectbox('Tuition Fees Up to Date', [0, 1]),
-    'Gender': st.selectbox('Gender', [0, 1]),
-    'Scholarship_holder': st.selectbox('Scholarship Holder', [0, 1]),
-    'Age_at_enrollment': st.number_input('Age at Enrollment', min_value=0, max_value=100, value=18),
-    'International': st.selectbox('International', [0, 1])
+course = st.selectbox('Course', [
+    'Biofuel Production Technologies',
+    'Animation and Multimedia Design',
+    'Social Service (evening attendance)',
+    'Agronomy',
+    'Communication Design',
+    'Veterinary Nursing',
+    'Informatics Engineering',
+    'Equinculture',
+    'Management',
+    'Social Service',
+    'Tourism',
+    'Nursing',
+    'Oral Hygiene',
+    'Advertising and Marketing Management',
+    'Journalism and Communication',
+    'Basic Education',
+    'Management (evening attendance)'
+])
+
+gender = st.selectbox('Gender', ['Male', 'Female'])
+daytime = st.selectbox('Daytime/evening attendance', ['Daytime', 'Evening'])
+age = st.number_input('Age at Enrollment', min_value=16, max_value=60, value=20)
+
+admission_grade = st.slider('Admission Grade', 0.0, 20.0, 10.0)
+special_needs = st.selectbox('Educational Special Needs', [0, 1])
+debtor = st.selectbox('Debtor', [0, 1])
+tuition_up_to_date = st.selectbox('Tuition Fees Up to Date', [0, 1])
+scholarship = st.selectbox('Scholarship Holder', [0, 1])
+
+sem1_grade = st.slider('Curricular Units 1st Sem Grade', 0.0, 20.0, 10.0)
+sem2_grade = st.slider('Curricular Units 2nd Sem Grade', 0.0, 20.0, 10.0)
+
+# Mapping categorical features
+course_map = {
+    'Biofuel Production Technologies': 0,
+    'Animation and Multimedia Design': 1,
+    'Social Service (evening attendance)': 2,
+    'Agronomy': 3,
+    'Communication Design': 4,
+    'Veterinary Nursing': 5,
+    'Informatics Engineering': 6,
+    'Equinculture': 7,
+    'Management': 8,
+    'Social Service': 9,
+    'Tourism': 10,
+    'Nursing': 11,
+    'Oral Hygiene': 12,
+    'Advertising and Marketing Management': 13,
+    'Journalism and Communication': 14,
+    'Basic Education': 15,
+    'Management (evening attendance)': 16
 }
+gender_map = {'Male': 0, 'Female': 1}
+daytime_map = {'Daytime': 0, 'Evening': 1}
 
-# Konversi ke DataFrame
-input_df = pd.DataFrame([features])
+# Feature Vector
+features = np.array([[
+    course_map[course],
+    gender_map[gender],
+    daytime_map[daytime],
+    admission_grade,
+    special_needs,
+    debtor,
+    tuition_up_to_date,
+    scholarship,
+    age,
+    sem1_grade,
+    sem2_grade
+]])
 
-# === [4] Scaling Data ===
-try:
-    input_scaled = scaler.transform(input_df)
-except Exception as e:
-    st.error(f'Error saat melakukan scaling data: {e}')
-    st.stop()
+# Scaling the features
+features_scaled = scaler.transform(features)
 
-# === [5] Prediksi ===
-if st.button('Prediksi Status'):
-    try:
-        pred = model.predict(input_scaled)
-        mapping = {0: 'Graduate', 1: 'Dropout', 2: 'Enrolled'}
-        st.success(f'### Prediksi Status Mahasiswa: **{mapping[pred[0]]}**')
-    except Exception as e:
-        st.error(f'Gagal melakukan prediksi: {e}')
+# Predict
+if st.button('Predict'):
+    prediction = model.predict(features_scaled)
+    result = 'Dropout' if prediction[0] == 0 else 'Not Dropout'
+    st.success(f'Student Status Prediction: {result}')
