@@ -33,27 +33,50 @@ Langkah-langkah menggunakan sistem machine learning berbasis random forest adala
 1. Membuka [link] https://kqzyspzttzq8tix3dappa.streamlit.app/
 2. Mengisi inputan prediksi, nilai Course tidak boleh 'None' serta terdapat batas minimum dan maksimum pada input numerik, seperti First semester grade dan second semester grade (maksimal 20). Selain itu, pengguna harus menekan enter atau tab agar data numerik tersimpan. terakhir menekan tombol predict
 3. Hasil prediksi akan tampil di bagian bawah.
-4. penjelasan pemilihan fitur prediksi, alasan mengapa masing-masing fitur dipilih:
-    a. Course
-        Program studi atau jurusan berpengaruh terhadap tingkat dropout karena perbedaan tingkat kesulitan, minat mahasiswa, dan lapangan pekerjaan yang tersedia. Misalnya, jurusan dengan kurikulum yang lebih berat cenderung memiliki angka dropout yang lebih tinggi.
-    b. Admission Grade
-        Nilai masuk mencerminkan kemampuan akademik awal siswa. Mahasiswa dengan nilai rendah saat masuk sering kali kesulitan mengikuti perkuliahan, meningkatkan risiko dropout.
-    c. Gender
-        Beberapa penelitian menunjukkan bahwa terdapat perbedaan dropout rate antara laki-laki dan perempuan, terutama terkait dengan motivasi, dukungan sosial, dan tanggung jawab di luar kampus.
-    d. Age at Enrollment
-        Usia saat mendaftar memengaruhi komitmen dan tanggung jawab mahasiswa. Mahasiswa yang lebih tua mungkin memiliki tanggung jawab pekerjaan atau keluarga yang mengganggu studi.
-    e. Educational Special Needs
-        Mahasiswa dengan kebutuhan pendidikan khusus (special needs) kadang memerlukan dukungan ekstra. Ketiadaan dukungan ini dapat meningkatkan risiko tidak menyelesaikan studi.
-    f. Debtor
-        Mahasiswa yang memiliki tunggakan biaya sering kali kesulitan melanjutkan pendidikan karena masalah finansial.
-    g. Tuition Up to Date
-        Pembayaran biaya kuliah yang lancar merupakan indikator mahasiswa tersebut mampu secara finansial, sehingga lebih mungkin untuk menyelesaikan studinya.
-    h. Scholarship Holder
-        Mahasiswa yang mendapatkan beasiswa cenderung lebih termotivasi dan memiliki dukungan finansial yang baik, sehingga risiko dropout lebih rendah.
-    i. First Semester Grade
-        Nilai semester pertama menjadi indikator awal adaptasi akademik mahasiswa. Jika nilainya rendah, kemungkinan dropout di semester berikutnya lebih tinggi.
-    j. Second Semester Grade
-        Sama halnya dengan semester pertama, performa di semester kedua mencerminkan keberlanjutan adaptasi akademik.
+4. Alasan pemilihan fiture, Dalam pengembangan model prediksi **dropout mahasiswa**, pemilihan fitur yang relevan menjadi kunci utama untuk meningkatkan akurasi dan interpretabilitas model. Berikut adalah penjelasan mengapa masing-masing fitur dipilih:
+
+    #### **1. Course**
+    Program studi atau jurusan berpengaruh terhadap tingkat dropout.  
+    - Beberapa program studi memiliki tingkat kesulitan berbeda yang dapat memengaruhi kemampuan mahasiswa bertahan.  
+    - Minat mahasiswa terhadap jurusan yang diambil juga berdampak pada motivasi belajar.  
+    - Peluang lapangan pekerjaan setelah lulus turut memengaruhi keputusan mahasiswa untuk melanjutkan studi.  
+    #### **2. Admission Grade**
+    Nilai masuk mencerminkan kemampuan akademik awal mahasiswa.  
+    - Mahasiswa dengan nilai rendah saat masuk sering kali menghadapi kesulitan mengikuti perkuliahan.  
+    - Ketidakmampuan beradaptasi dengan materi kuliah meningkatkan risiko dropout.  
+    #### **3. Gender**
+    Beberapa penelitian menunjukkan adanya perbedaan tingkat dropout antara laki-laki dan perempuan.  
+    - Faktor motivasi, dukungan sosial, dan tanggung jawab di luar kampus berbeda antara gender.  
+    - Hal ini memengaruhi komitmen mahasiswa terhadap studinya.  
+    #### **4. Age at Enrollment**
+    Usia saat mendaftar memengaruhi komitmen dan tanggung jawab mahasiswa.  
+    - Mahasiswa yang lebih tua cenderung memiliki tanggung jawab pekerjaan atau keluarga.  
+    - Tanggung jawab tersebut sering kali mengganggu proses studi dan meningkatkan risiko dropout.  
+    #### **5. Educational Special Needs**
+    Mahasiswa dengan kebutuhan pendidikan khusus (*special needs*) membutuhkan dukungan ekstra.  
+    - Ketiadaan dukungan khusus dapat menghambat proses belajar mereka.  
+    - Akibatnya, risiko tidak menyelesaikan studi menjadi lebih tinggi.  
+    #### **6. Debtor**
+    Mahasiswa yang memiliki tunggakan biaya kuliah sering kali mengalami kesulitan finansial.  
+    - Keterbatasan finansial ini dapat memaksa mereka untuk berhenti kuliah.  
+    - Masalah ekonomi menjadi salah satu alasan utama mahasiswa tidak melanjutkan pendidikan.  
+    #### **7. Tuition Up to Date**
+    Pembayaran biaya kuliah yang lancar mencerminkan stabilitas finansial.  
+    - Mahasiswa yang tidak menunggak pembayaran memiliki kemungkinan lebih besar untuk menyelesaikan studi.  
+    - Hal ini menunjukkan manajemen keuangan yang baik selama masa studi.  
+    #### **8. Scholarship Holder**
+    Mahasiswa yang mendapatkan beasiswa umumnya lebih termotivasi dan memiliki dukungan finansial.  
+    - Beasiswa memberikan insentif bagi mahasiswa untuk mempertahankan performa akademik.  
+    - Dukungan finansial ini mengurangi risiko dropout karena masalah biaya.  
+    #### **9. First Semester Grade**
+    Nilai semester pertama merupakan indikator adaptasi akademik mahasiswa.  
+    - Jika nilai rendah, sering kali menunjukkan kesulitan dalam memahami materi.  
+    - Kesulitan tersebut berpotensi meningkatkan risiko dropout di semester berikutnya.  
+    #### **10. Second Semester Grade**
+    Performa di semester kedua mencerminkan keberlanjutan adaptasi akademik.  
+    - Nilai rendah di semester ini menjadi sinyal bahwa mahasiswa tidak dapat mengejar ketertinggalan.  
+    - Risiko dropout semakin tinggi jika performa tidak membaik.  
+Dengan memahami alasan di balik pemilihan fitur-fitur ini, diharapkan model prediksi dapat lebih akurat dalam mengidentifikasi potensi dropout dan memungkinkan langkah preventif yang lebih tepat.
 
 ## Conclusion
 1. Biaya pendidikan terbaru menjadi faktor utama yang memengaruhi siswa untuk dropout. Sebanyak 32,2% siswa dengan biaya pendidikan terbaru memutuskan untuk berhenti studi. Hal ini mungkin disebabkan oleh tingginya biaya yang dianggap memberatkan oleh sebagian mahasiswa. Kondisi ini diperparah ketika biaya yang tinggi mendorong siswa untuk berhutang, di mana 22% dari total siswa yang dropout tercatat memiliki hutang.
